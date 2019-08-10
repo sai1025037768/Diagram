@@ -1,0 +1,63 @@
+@startuml
+
+autonumber
+
+title OkHttpClient Interceptor Chain
+
+
+activate RealCall
+RealCall -> RealInterceptorChain: getResponseWithInterceptorChain()
+activate RealInterceptorChain
+
+RealInterceptorChain -> RetryAndFollowUpInterceptor: proceed()
+activate RetryAndFollowUpInterceptor
+
+RetryAndFollowUpInterceptor -> RealInterceptorChain: intercept()
+activate RealInterceptorChain
+RealInterceptorChain -> BridgeInterceptor: proceed()
+activate BridgeInterceptor
+note right
+	BridgeInterceptor 处理请求头信息，将Request中的请求信息转换为请求头；
+	处理Cookie，将Cookie添加到请求头；
+end note
+
+BridgeInterceptor -> RealInterceptorChain: intercept()
+activate RealInterceptorChain
+RealInterceptorChain -> CacheInterceptor: proceed()
+activate CacheInterceptor
+note right
+	CacheInterceptor处理缓存Response，根据条件确认是否返回Response缓存
+end note
+
+CacheInterceptor -> RealInterceptorChain: intercept()
+activate RealInterceptorChain
+RealInterceptorChain -> ConnectInterceptor: proceed()
+activate ConnectInterceptor
+CacheInterceptor -> RealInterceptorChain: intercept()
+activate RealInterceptorChain
+RealInterceptorChain -> CallServerInterceptor: proceed()
+activate CallServerInterceptor
+note right
+	真正的进行请求，返回Response
+end note
+
+CallServerInterceptor --> RealInterceptorChain: return Response
+deactivate CallServerInterceptor
+deactivate RealInterceptorChain
+
+ConnectInterceptor --> RealInterceptorChain: return Response
+deactivate ConnectInterceptor
+deactivate RealInterceptorChain
+CacheInterceptor --> RealInterceptorChain: return Response
+deactivate CacheInterceptor
+deactivate RealInterceptorChain
+BridgeInterceptor --> RealInterceptorChain: return Response
+deactivate BridgeInterceptor
+deactivate RealInterceptorChain
+RetryAndFollowUpInterceptor --> RealInterceptorChain: return Response
+deactivate RetryAndFollowUpInterceptor
+deactivate RealInterceptorChain
+
+RealInterceptorChain --> RealCall: return Response
+deactivate RealCall
+@enduml
