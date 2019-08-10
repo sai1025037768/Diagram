@@ -33,6 +33,10 @@ CacheInterceptor -> RealInterceptorChain: intercept()
 activate RealInterceptorChain
 RealInterceptorChain -> ConnectInterceptor: proceed()
 activate ConnectInterceptor
+note right
+	创建Socket连接
+end note
+
 CacheInterceptor -> RealInterceptorChain: intercept()
 activate RealInterceptorChain
 RealInterceptorChain -> CallServerInterceptor: proceed()
